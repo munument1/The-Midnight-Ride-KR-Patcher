@@ -2,7 +2,7 @@ using Mutagen.Bethesda.Plugins.Records;
 
 internal static class TranslationSafety
 {
-    public const int PolicyVersion = 5;
+    public const int PolicyVersion = 6;
 
     public static bool IsProtected(IMajorRecord record)
     {

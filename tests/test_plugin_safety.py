@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 import tmrkr
 from tmrkr_output import build_output
-from tmrkr_plugin_safety import plugin_skip_reason
+from tmrkr_plugin_safety import plugin_skip_reason, PLUGIN_POLICY_VERSION
 
 
 def subrecord(signature, body):
@@ -155,7 +155,7 @@ class PluginSafetyTests(unittest.TestCase):
                 providers={source.name.casefold(): [winner]}, warnings=[], source=lambda _: source)
             with patch("tmrkr_output.tmrkr.Installation", return_value=installation), \
                     patch("tmrkr_output._run_fallback", return_value=(
-                        {"status": "no_changes", "plugin_policy_version": 5}, None)) as backend:
+                        {"status": "no_changes", "plugin_policy_version": PLUGIN_POLICY_VERSION}, None)) as backend:
                 report = build_output(root, base, catalog_dir, root / "Output")
                 backend.assert_called_once()
                 self.assertEqual(report["plugins"][0]["status"], "updated_no_match")
@@ -175,8 +175,9 @@ class PluginSafetyTests(unittest.TestCase):
             payload.write_bytes(source.read_bytes())
             entry = {"name": source.name, "source_sha256": tmrkr.sha256(source),
                      "baseline_status": "translated", "payload": payload.name,
-                     "payload_sha256": tmrkr.sha256(payload), "plugin_policy_version": 5,
-                     "payload_encoding": "utf-8", "text_roundtrip_verified": True}
+                     "payload_sha256": tmrkr.sha256(payload), "plugin_policy_version": PLUGIN_POLICY_VERSION,
+                     "payload_encoding": "utf-8", "text_roundtrip_verified": True,
+                     "final_binary_verified": True, "world_index_policy": "strip_wrld_ofst_clsz_v1"}
             (catalog_dir / "catalog.json").write_text(json.dumps(
                 {"schema_version": 1, "plugins": [entry]}), encoding="utf-8")
             winner = {"provider": "Example", "path": source.name}

@@ -126,7 +126,10 @@ def main() -> int:
                 raise ValueError(f"Unstripped world-index payload: {plugin}")
             if row.get("detail", {}).get("utf8_text_verified") is not True:
                 raise ValueError(f"Unverified UTF-8 payload: {plugin}")
-            entry.update(payload_encoding="utf-8", text_roundtrip_verified=True)
+            if row.get("detail", {}).get("final_binary_verified") is not True:
+                raise ValueError(f"Unverified final binary: {plugin}")
+            entry.update(payload_encoding="utf-8", text_roundtrip_verified=True,
+                         final_binary_verified=True, world_index_policy="strip_wrld_ofst_clsz_v1")
             payload_rel = Path("exact-plugins") / plugin
             payload_target = out / payload_rel
             payload_target.parent.mkdir(parents=True, exist_ok=True)

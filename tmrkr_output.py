@@ -120,6 +120,8 @@ def _verified_exact_payload(catalog_dir: Path, entry: dict) -> Path | None:
     # by the UTF-8 backend and checked by a text roundtrip may bypass translation.
     if (entry.get("payload_encoding") != "utf-8"
             or entry.get("text_roundtrip_verified") is not True
+            or entry.get("final_binary_verified") is not True
+            or entry.get("world_index_policy") != "strip_wrld_ofst_clsz_v1"
             or not entry.get("payload")):
         return None
     payload = _contained(catalog_dir, entry["payload"])
@@ -148,6 +150,10 @@ def _run_fallback(source: Path, plugin: str, entry: dict | None,
     if (not detail.get("status", "").startswith("skipped_")
             and detail.get("plugin_policy_version") != PLUGIN_POLICY_VERSION):
         raise RuntimeError(f"{plugin}: backend is outdated; rebuild TmrPluginTranslator.exe")
+    if detail.get("status") == "translated" and (
+            detail.get("final_binary_verified") is not True
+            or detail.get("world_index_policy") != "strip_wrld_ofst_clsz_v1"):
+        raise RuntimeError(f"{plugin}: final binary verification is missing")
     return detail, output if output.is_file() else None
 
 

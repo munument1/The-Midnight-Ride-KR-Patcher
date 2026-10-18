@@ -786,63 +786,69 @@ internal static class Program
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);
         if (File.Exists(output)) File.Delete(output);
 
-        var scratch = Path.Combine(Path.GetDirectoryName(output)!, ".serialize-" + Guid.NewGuid().ToString("N"));
-        var baselinePath = Path.Combine(scratch, "baseline", Path.GetFileName(input));
-        var translatedPath = Path.Combine(scratch, "translated", Path.GetFileName(input));
+        WorldIndexStripper.Result strippedIndexes;
+        FinalPluginVerifier.Result finalVerification;
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(baselinePath)!);
-            Directory.CreateDirectory(Path.GetDirectoryName(translatedPath)!);
-            var originalMod = Fallout4Mod.CreateFromBinary(
-                new ModPath(modKey, input), Fallout4Release.Fallout4, sourceRead);
-            await originalMod.BeginWrite.ToPath(baselinePath)
-                .WithLoadOrderFromHeaderMasters().WithNoDataFolder().WithUtf8Encoding()
-                .WithExplicitOverridingMasterList(inputMasters).WithMastersListOrdering(inputMasters)
-                .NoMastersListContentCheck().WriteAsync();
-            await mod.BeginWrite.ToPath(translatedPath)
-                .WithLoadOrderFromHeaderMasters().WithNoDataFolder().WithUtf8Encoding()
-                .WithExplicitOverridingMasterList(inputMasters).WithMastersListOrdering(inputMasters)
-                .NoMastersListContentCheck().WriteAsync();
-            totalChanged = OriginalTextWriter.Write(input, baselinePath, translatedPath,
-                directRows.Concat(fallbackRows).Select(x =>
-                    new OriginalTextWriter.Pair(x.record, x.field, x.source, x.dest)),
-                totalChanged, output);
-        }
-        finally
-        {
-            if (File.Exists(baselinePath)) File.Delete(baselinePath);
-            if (File.Exists(translatedPath)) File.Delete(translatedPath);
-            Directory.Delete(scratch, true);
-        }
+            var scratch = Path.Combine(Path.GetDirectoryName(output)!, ".serialize-" + Guid.NewGuid().ToString("N"));
+            var baselinePath = Path.Combine(scratch, "baseline", Path.GetFileName(input));
+            var translatedPath = Path.Combine(scratch, "translated", Path.GetFileName(input));
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(baselinePath)!);
+                Directory.CreateDirectory(Path.GetDirectoryName(translatedPath)!);
+                var originalMod = Fallout4Mod.CreateFromBinary(
+                    new ModPath(modKey, input), Fallout4Release.Fallout4, sourceRead);
+                await originalMod.BeginWrite.ToPath(baselinePath)
+                    .WithLoadOrderFromHeaderMasters().WithNoDataFolder().WithUtf8Encoding()
+                    .WithExplicitOverridingMasterList(inputMasters).WithMastersListOrdering(inputMasters)
+                    .NoMastersListContentCheck().WriteAsync();
+                await mod.BeginWrite.ToPath(translatedPath)
+                    .WithLoadOrderFromHeaderMasters().WithNoDataFolder().WithUtf8Encoding()
+                    .WithExplicitOverridingMasterList(inputMasters).WithMastersListOrdering(inputMasters)
+                    .NoMastersListContentCheck().WriteAsync();
+                totalChanged = OriginalTextWriter.Write(input, baselinePath, translatedPath,
+                    directRows.Concat(fallbackRows).Select(x =>
+                        new OriginalTextWriter.Pair(x.record, x.field, x.source, x.dest)),
+                    totalChanged, output);
+            }
+            finally
+            {
+                if (File.Exists(baselinePath)) File.Delete(baselinePath);
+                if (File.Exists(translatedPath)) File.Delete(translatedPath);
+                Directory.Delete(scratch, true);
+            }
 
-        WorldIndexStripper.Result strippedIndexes;
-        try { strippedIndexes = WorldIndexStripper.StripAndVerify(output); }
+            strippedIndexes = WorldIndexStripper.StripAndVerify(output);
+            finalVerification = FinalPluginVerifier.Verify(input, output,
+                directRows.Concat(fallbackRows).Select(x =>
+                    new OriginalTextWriter.Pair(x.record, x.field, x.source, x.dest)), totalChanged);
+            if (finalVerification.OFST != strippedIndexes.OFST || finalVerification.CLSZ != strippedIndexes.CLSZ)
+                throw new InvalidDataException("Final world-index removal count mismatch");
+
+            var verify = Fallout4Mod.CreateFromBinary(
+                new ModPath(modKey, output),
+                Fallout4Release.Fallout4, utf8Read);
+
+            var verifyMasters = verify.ModHeader.MasterReferences.Select(x => x.Master).ToArray();
+            if (!inputMasters.SequenceEqual(verifyMasters))
+                throw new InvalidDataException("Master list/order changed during translation");
+
+            var verifyRecords = verify.EnumerateMajorRecords().ToDictionary(x => x.FormKey);
+            if (verifyRecords.Count != records.Count)
+                throw new InvalidDataException(
+                    $"Fresh read record count mismatch: {records.Count} -> {verifyRecords.Count}");
+
+            foreach (var key in records.Keys)
+                if (!verifyRecords.ContainsKey(key))
+                    throw new InvalidDataException($"Fresh read missing record: {key}");
+
+        }
         catch
         {
-            File.Delete(output);
+            if (File.Exists(output)) File.Delete(output);
             throw;
         }
-
-        var verify = Fallout4Mod.CreateFromBinary(
-            new ModPath(modKey, output),
-            Fallout4Release.Fallout4, utf8Read);
-
-        var verifyMasters = verify.ModHeader.MasterReferences.Select(x => x.Master).ToArray();
-        if (!inputMasters.SequenceEqual(verifyMasters))
-            throw new InvalidDataException("Master list/order changed during translation");
-
-        var verifyRecords = verify.EnumerateMajorRecords().ToDictionary(x => x.FormKey);
-        if (verifyRecords.Count != records.Count)
-            throw new InvalidDataException(
-                $"Fresh read record count mismatch: {records.Count} -> {verifyRecords.Count}");
-
-        foreach (var key in records.Keys)
-            if (!verifyRecords.ContainsKey(key))
-                throw new InvalidDataException($"Fresh read missing record: {key}");
-
-        // OriginalTextWriter checks complete source/destination bytes for every
-        // emitted display field. Generic object-only changes (e.g. actor notes)
-        // are intentionally not emitted and must not be expected on fresh read.
 
         Console.WriteLine(JsonSerializer.Serialize(new {
             status = "translated",
@@ -853,6 +859,9 @@ internal static class Program
             verified_strings = totalChanged,
             translation_encoding = "utf-8",
             original_bytes_preserved = true,
+            final_binary_verified = true,
+            final_binary_verification = finalVerification,
+            world_index_policy = "strip_wrld_ofst_clsz_v1",
             world_indexes_removed = strippedIndexes,
             world_indexes_absent_verified = true,
             input,
