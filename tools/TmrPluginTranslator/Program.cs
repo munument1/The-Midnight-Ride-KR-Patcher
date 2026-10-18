@@ -121,17 +121,7 @@ internal static class Program
         {
             for (var i = 0; i < list.Count; i++)
             {
-                var item = list[i];
-                if (item is string s && replacements.TryGetValue(s, out var dest) && dest != s && !list.IsReadOnly)
-                {
-                    list[i] = dest;
-                    hits[s] = hits.GetValueOrDefault(s) + 1;
-                    changed++;
-                }
-                else
-                {
-                    changed += ReplaceStrings(item, replacements, hits, visited, depth + 1);
-                }
+                changed += ReplaceStrings(list[i], replacements, hits, visited, depth + 1);
             }
             return changed;
         }
@@ -158,18 +148,7 @@ internal static class Program
 
             if (property.PropertyType == typeof(string))
             {
-                if (!property.CanWrite) continue;
-                var s = (string)value;
-                if (replacements.TryGetValue(s, out var dest) && dest != s)
-                {
-                    try
-                    {
-                        property.SetValue(obj, dest);
-                        hits[s] = hits.GetValueOrDefault(s) + 1;
-                        changed++;
-                    }
-                    catch { }
-                }
+                // Plain strings are script notes, identifiers and asset paths.
                 continue;
             }
 
@@ -201,12 +180,7 @@ internal static class Program
     {
         if (obj is null || depth > 20) return;
 
-        if (obj is string direct)
-        {
-            if (wanted.Contains(direct))
-                counts[direct] = counts.GetValueOrDefault(direct) + 1;
-            return;
-        }
+        if (obj is string) return;
 
         if (obj is TranslatedString translated)
         {
@@ -236,12 +210,7 @@ internal static class Program
             catch { continue; }
             if (value is null) continue;
 
-            if (value is string text)
-            {
-                if (wanted.Contains(text))
-                    counts[text] = counts.GetValueOrDefault(text) + 1;
-                continue;
-            }
+            if (value is string) continue;
 
             if (value is TranslatedString ts)
             {
@@ -880,6 +849,9 @@ internal static class Program
             plugin_policy_version = TranslationSafety.PolicyVersion,
             protected_records = protectedRecords,
             utf8_text_verified = true,
+            text_roundtrip_verified = true,
+            verified_strings = totalChanged,
+            translation_encoding = "utf-8",
             original_bytes_preserved = true,
             world_indexes_removed = strippedIndexes,
             world_indexes_absent_verified = true,

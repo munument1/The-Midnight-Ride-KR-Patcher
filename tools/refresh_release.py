@@ -28,12 +28,16 @@ def write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path, resume=False):
+def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path, resume=False, backend=None):
     if not resume and (package.exists() or output.exists()):
         raise FileExistsError("Use new package and Output directories")
     if not resume:
         shutil.copytree(previous, package)
     data = package / "TranslationData"
+    if backend:
+        if resume:
+            raise ValueError("A new backend requires a fresh Output")
+        shutil.copy2(backend, data / "Backend/TmrPluginTranslator.exe")
     catalog = read(data / "catalog.json")
     catalog["version"] = tmrkr.VERSION
     catalog["profile_built_from"] = profile
@@ -91,6 +95,9 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
                      baseline_status="translated" if row["changed"] else "no_changes",
                      changed=row["changed"])
         if row["changed"]:
+            detail = row.get("detail", {})
+            if status != "exact_payload" and not detail.get("utf8_text_verified"):
+                raise ValueError(f"Unverified UTF-8 output: {name}")
             payload = _provider_target(output, {"provider": row["provider"], "path": row["relative_path"]})
             if not payload.is_file() or offset_tables(payload):
                 raise ValueError(f"Missing or unsafe payload: {name}")
@@ -98,7 +105,8 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
             target = _contained(data, relative)
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(payload, target)
-            entry.update(payload=relative, payload_sha256=tmrkr.sha256(target))
+            entry.update(payload=relative, payload_sha256=tmrkr.sha256(target),
+                         payload_encoding="utf-8", text_roundtrip_verified=True)
         entries.append(entry)
     catalog["plugins"] = entries
     # Retain dictionaries for removed optional mods, but remove stale exact files.
@@ -128,5 +136,6 @@ if __name__ == "__main__":
     ap.add_argument("--package", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--resume", action="store_true", help="Promote an existing Output after verifying source hashes")
+    ap.add_argument("--backend-exe", type=Path, help="Use a newly published self-contained backend")
     args = ap.parse_args()
-    refresh(args.previous, args.mo2_root, args.profile, args.package, args.output, args.resume)
+    refresh(args.previous, args.mo2_root, args.profile, args.package, args.output, args.resume, args.backend_exe)

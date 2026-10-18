@@ -17,6 +17,7 @@ TranslationData/generated/
 reports/
 .probe/
 .roundtrip/
+.tmrkr-output-*/
 .xtranslator_test/
 vendor/
 .patch_program.py

@@ -175,7 +175,8 @@ class PluginSafetyTests(unittest.TestCase):
             payload.write_bytes(source.read_bytes())
             entry = {"name": source.name, "source_sha256": tmrkr.sha256(source),
                      "baseline_status": "translated", "payload": payload.name,
-                     "payload_sha256": tmrkr.sha256(payload), "plugin_policy_version": 5}
+                     "payload_sha256": tmrkr.sha256(payload), "plugin_policy_version": 5,
+                     "payload_encoding": "utf-8", "text_roundtrip_verified": True}
             (catalog_dir / "catalog.json").write_text(json.dumps(
                 {"schema_version": 1, "plugins": [entry]}), encoding="utf-8")
             winner = {"provider": "Example", "path": source.name}
