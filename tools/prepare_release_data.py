@@ -124,6 +124,9 @@ def main() -> int:
                 raise ValueError(f"Outdated payload: {plugin}; rebuild with current backend")
             if offset_tables(payload_source):
                 raise ValueError(f"Unstripped world-index payload: {plugin}")
+            if row.get("detail", {}).get("utf8_text_verified") is not True:
+                raise ValueError(f"Unverified UTF-8 payload: {plugin}")
+            entry.update(payload_encoding="utf-8", text_roundtrip_verified=True)
             payload_rel = Path("exact-plugins") / plugin
             payload_target = out / payload_rel
             payload_target.parent.mkdir(parents=True, exist_ok=True)

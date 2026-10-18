@@ -8,7 +8,18 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 
 > 이 프로젝트는 ModdingLinked 또는 The Midnight Ride 제작진의 공식 번역/도구가 아닙니다.
 
-## v1.0.1 변경점
+## v1.0.3 — 2026-10-19 TMR 대응
+
+- 현재 Extended 프로필의 비공식 플러그인 60개를 검사하고 번역 payload 39개를 준비했습니다.
+- v1.0.2 대비 신규 플러그인 5개와 변경 플러그인 15개에 대응했습니다.
+- Simple FOV Slider 메뉴·도움말 23문구를 번역했습니다.
+- Safe Travels Interface 신규 4문구를 추가하고, 홀로테이프 메뉴 순서 변경에 맞춰 터미널 55문구의 매핑을 갱신했습니다.
+- PR #1의 Interface UTF-16 LE(BOM), 비번역 메모 보존, payload 검증 및 회귀 테스트를 현재 원본 보존 백엔드와 통합했습니다.
+- localized 플러그인은 기존처럼 제외하고 경고합니다. 설치 폴더를 직접 수정하지 않습니다.
+
+자세한 내용과 재생성 방법은 [v1.0.3 릴리즈 노트](docs/releases/v1.0.3.md)를 확인하세요.
+
+## 이전 변경점
 
 ### v1.0.2 안전 저장 업데이트
 
@@ -43,7 +54,7 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 - `Interface/Translations` 번역 지원
 - Fallout 4 영문판 런타임에 맞춰 한국어 내용이어도 `_en` 파일명을 유지
 
-TMR Extended 프로필 기준 비공식 플러그인 59개 중 T60 Pistol/Vangraff 2개는 명시적으로 제외합니다.
+v1.0.2 당시 TMR Extended 프로필 기준 비공식 플러그인 59개 중 T60 Pistol/Vangraff 2개는 명시적으로 제외합니다.
 v1.0.2는 나머지 57개를 검사해 원본 데이터 보존을 검증한 exact payload 40개를 새로 준비했습니다.
 이전 버전의 payload는 포함하지 않으며 기존 direct 사전과 본편/DLC fallback 번역을 재사용합니다.
 
@@ -56,7 +67,7 @@ v1.0.2는 나머지 57개를 검사해 원본 데이터 보존을 검증한 exac
 
 ## 사용 방법
 
-1. GitHub Releases에서 `TMR-Korean-Patcher-v1.0.2.zip`을 내려받아 압축을 풉니다.
+1. GitHub Releases에서 `TMR-Korean-Patcher-v1.0.3.zip`을 내려받아 압축을 풉니다.
 2. `TMR-Korean-Patcher.exe`를 실행합니다.
 3. `ModOrganizer.ini`가 있는 TMR MO2 폴더를 선택합니다.
 4. **Output 생성**을 누릅니다.
@@ -90,12 +101,22 @@ Interface:
 
 ## 번역 적용 우선순위
 
-1. 현재 검증 버전과 해시가 일치하면 검증된 exact payload 사용
+1. 현재 버전과 입력 해시가 일치하고, UTF-8 저장 및 텍스트 재읽기 검증이 기록된 exact payload 사용
 2. 모드 전용 direct 번역 사전
 3. Fallout 4 본편/공식 DLC의 동일 레코드 번역 상속
 4. 안전하게 매칭되지 않는 문자열은 변경하지 않음
 
 Fallback은 현재 영문 원문까지 확인하므로, 모드가 의도적으로 문구를 바꾼 경우 과거 바닐라 번역을 강제로 덮어쓰지 않습니다.
+
+검증 정보가 없는 기존 exact payload나 누락된 파일은 사용하지 않고 direct/fallback 사전으로 처리합니다. exact payload와 direct 사전은 서로 겹치는 목록이며, direct 사전이 없는 플러그인도 원본 게임/DLC fallback 사전으로 번역할 수 있습니다.
+
+## 한국어 저장 형식 및 기존 손상 파일
+
+ESP/ESM의 번역 문자열은 UTF-8로 저장합니다. localized 플러그인의 문자열 테이블은 이번 버전에서도 제외합니다. `Interface/Translations/*_en.txt`는 UTF-16 LE(BOM 포함)로 저장합니다. 입력 영문 파일의 CP1252 특수문자는 읽을 때 보존하며, 제작용 메모·식별자 등 비번역 필드는 번역하지 않습니다.
+
+저장 후 변경된 문자열을 다시 읽어 기대한 번역과 일치하는지 검사합니다. 이미 `???`가 저장된 설치 파일은 깨끗한 영문 원본으로 복구한 뒤 Output을 다시 생성해야 합니다. `direct-maps`에 없는 플러그인도 fallback 적용 대상이므로 복구 범위를 이 폴더의 파일 이름만으로 판단하지 마세요.
+
+개발자용 재현·테스트 방법과 payload 재생성 정책은 [번역 인코딩 문서](docs/translation-encoding.md)를 참고하세요.
 
 ## MCM / Interface
 
@@ -111,6 +132,7 @@ Fallback은 현재 영문 원문까지 확인하므로, 모드가 의도적으�
 
 - Mod Configuration Menu
 - Safe Travels
+- Simple FOV Slider
 
 ## 제외 대상
 
@@ -131,7 +153,7 @@ Fallback은 현재 영문 원문까지 확인하므로, 모드가 의도적으�
 
 이전 payload는 한글 인코딩 또는 번역 제외 정책을 우회할 수 있어 재사용하지 않습니다.
 새 백엔드로 payload를 재생성하고 `plugin_policy_version: 5`를 기록해야 exact 경로를 사용합니다.
-정책 버전�� 없는 기존 카탈로그는 최신 백엔드로 fallback을 수행하며, 구형 백엔드 결과는 거부합니다.
+정책 버전이 없는 기존 카탈로그는 최신 백엔드로 fallback을 수행하며, 구형 백엔드 결과는 거부합니다.
 
 ### PRP 81.9 월드 인덱스 대응
 
