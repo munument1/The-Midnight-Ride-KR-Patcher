@@ -2,7 +2,9 @@ using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Text;
 
-// Match xTranslator 1.7.3's temporary WRLD index removal policy after serialization.
+// xTranslator 1.7.3 AUTHOR CHANGELOG documents temporary OFST/CLSZ removal.
+// Public GitHub source is still 1.6.0; this is our implementation, not a port
+// or a claim that 1.7.3 implementation details were available for inspection.
 internal static class WorldIndexStripper
 {
     internal sealed record Result(int OFST, int CLSZ, int XXXX);

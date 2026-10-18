@@ -3,7 +3,7 @@ from pathlib import Path
 import struct
 import zlib
 
-PLUGIN_POLICY_VERSION = 5
+PLUGIN_POLICY_VERSION = 6
 
 
 def _subrecords(body: bytes):

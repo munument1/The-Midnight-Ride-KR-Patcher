@@ -9,7 +9,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from compare_plugin_save import compare, inspect
-from tmrkr_plugin_safety import _subrecords
+from tmrkr_plugin_safety import _subrecords, PLUGIN_POLICY_VERSION
 
 
 class PrpIndexRemovalTests(unittest.TestCase):
@@ -36,7 +36,8 @@ class PrpIndexRemovalTests(unittest.TestCase):
             self.assertEqual(run.returncode, 0, run.stderr)
             report = json.loads(run.stdout)
             self.assertEqual(report["changed"], 1)
-            self.assertEqual(report["plugin_policy_version"], 5)
+            self.assertEqual(report["plugin_policy_version"], PLUGIN_POLICY_VERSION)
+            self.assertTrue(report["final_binary_verified"])
             self.assertTrue(report["utf8_text_verified"])
             result = compare(source, output)
             self.assertTrue(result["record_key_sets_equal"])

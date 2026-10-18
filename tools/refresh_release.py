@@ -98,6 +98,9 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
             detail = row.get("detail", {})
             if status != "exact_payload" and not detail.get("utf8_text_verified"):
                 raise ValueError(f"Unverified UTF-8 output: {name}")
+            if status != "exact_payload" and (detail.get("final_binary_verified") is not True
+                    or detail.get("world_index_policy") != "strip_wrld_ofst_clsz_v1"):
+                raise ValueError(f"Unverified final binary: {name}")
             payload = _provider_target(output, {"provider": row["provider"], "path": row["relative_path"]})
             if not payload.is_file() or offset_tables(payload):
                 raise ValueError(f"Missing or unsafe payload: {name}")
@@ -106,7 +109,8 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(payload, target)
             entry.update(payload=relative, payload_sha256=tmrkr.sha256(target),
-                         payload_encoding="utf-8", text_roundtrip_verified=True)
+                         payload_encoding="utf-8", text_roundtrip_verified=True,
+                         final_binary_verified=True, world_index_policy="strip_wrld_ofst_clsz_v1")
         entries.append(entry)
     catalog["plugins"] = entries
     # Retain dictionaries for removed optional mods, but remove stale exact files.

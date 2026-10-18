@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import re
 
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 PLUGIN_SUFFIXES = {".esm", ".esp", ".esl"}
 LOOSE_PREFIXES = ("mcm/", "interface/translations/", "interface/")
 

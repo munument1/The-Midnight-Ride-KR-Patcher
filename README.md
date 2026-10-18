@@ -8,6 +8,14 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 
 > 이 프로젝트는 ModdingLinked 또는 The Midnight Ride 제작진의 공식 번역/도구가 아닙니다.
 
+## v1.0.4 — 최종 파일 검증 보강
+
+- xTranslator 1.7.3 제작자가 명시한 OFST/CLSZ 제거 정책을 확인하고 유지합니다.
+- 공개 GitHub 소스는 1.6.0이므로 최신 구현을 소스로 직접 확인했다는 주장은 하지 않습니다.
+- 저장이 끝난 파일을 원본과 전체 대조하여, 지정된 문자열·인덱스·길이 변경 이외에는 거부합니다.
+- 지몬자 전체 레코드·비번역 데이터·중첩/순서·XXXX 보존 검사를 런타임에서 수행하고, 실패한 출력을 폐기합니다.
+- 정책 6으로 payload를 다시 생성합니다. [검토 근거](docs/validation/xtranslator-prp-review.md)와 [릴리즈 노트](docs/releases/v1.0.4.md)를 확인하세요.
+
 ## v1.0.3 — 2026-10-19 TMR 대응
 
 - 현재 Extended 프로필의 비공식 플러그인 60개를 검사하고 번역 payload 39개를 준비했습니다.
@@ -69,7 +77,7 @@ v1.0.2는 나머지 57개를 검사해 원본 데이터 보존을 검증한 exac
 
 ## 사용 방법
 
-1. GitHub Releases에서 `TMR-Korean-Patcher-v1.0.3.zip`을 내려받아 압축을 풉니다.
+1. GitHub Releases에서 `TMR-Korean-Patcher-v1.0.4.zip`을 내려받아 압축을 풉니다.
 2. `TMR-Korean-Patcher.exe`를 실행합니다.
 3. `ModOrganizer.ini`가 있는 TMR MO2 폴더를 선택합니다.
 4. **Output 생성**을 누릅니다.
@@ -154,7 +162,7 @@ ESP/ESM의 번역 문자열은 UTF-8로 저장합니다. localized 플러그인�
 이는 알려진 증상을 피하기 위한 정책이며 지몬자 문제의 근본 원인이 확정된 것은 아닙니다.
 
 이전 payload는 한글 인코딩 또는 번역 제외 정책을 우회할 수 있어 재사용하지 않습니다.
-새 백엔드로 payload를 재생성하고 `plugin_policy_version: 5`를 기록해야 exact 경로를 사용합니다.
+새 백엔드로 payload를 재생성하고 `plugin_policy_version: 6`를 기록해야 exact 경로를 사용합니다.
 정책 버전이 없는 기존 카탈로그는 최신 백엔드로 fallback을 수행하며, 구형 백엔드 결과는 거부합니다.
 
 ### PRP 81.9 월드 인덱스 대응
@@ -165,7 +173,7 @@ ESP/ESM의 번역 문자열은 UTF-8로 저장합니다. localized 플러그인�
 다른 하위 필드의 XXXX는 보존합니다. TES4 월드 인덱스는 지원하지 않아 제외합니다.
 
 저장 후 두 인덱스가 없고 마스터 순서·레코드 집합·번역문이 유지되는지 검증합니다.
-정책 버전 4 이하 payload는 재사용하지 않고 새 백엔드로 번역합니다.
+정책 버전 5 이하 payload는 재사용하지 않고 새 백엔드로 번역합니다.
 번역할 문자열이 없으면 출력 파일을 생성하지 않아 원본 인덱스는 그대로 둡니다.
 
 첨부 PRP 81.90 두 파일에서 한글 장소명 저장과 모든 WRLD 인덱스 제거를 확인했습니다.
