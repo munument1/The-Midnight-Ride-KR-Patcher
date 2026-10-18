@@ -19,6 +19,8 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 
 자세한 내용과 재생성 방법은 [v1.0.3 릴리즈 노트](docs/releases/v1.0.3.md)를 확인하세요.
 
+과거 지몬자 플레이 불가 및 PRP 지형 로딩 이상 제보에 대해서는 [배포 ZIP 집중 검증 결과](docs/validation/v1.0.3-known-regressions.md)를 확인하세요. 파일 검사는 통과했으며, 게임 내 비교 검증은 아직 수행하지 않았습니다.
+
 ## 이전 변경점
 
 ### v1.0.2 안전 저장 업데이트
