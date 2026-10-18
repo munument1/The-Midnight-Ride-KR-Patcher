@@ -1,0 +1,33 @@
+{
+  "Simple FOV Slider_en.json": {
+    "Simple FOV Slider": "간편 시야각 설정",
+    "By SoleVaultBoy": "제작: SoleVaultBoy",
+    "About": "모드 소개",
+    "Allows to adjust various FOV settings.": "다양한 시야각(FOV) 설정을 조절할 수 있습니다.",
+    "Display": "화면",
+    "First-Person FOV": "1인칭 시야각",
+    "[Default: 80.0] The FOV in first-person.": "[기본값: 80.0] 1인칭 시점의 시야각입니다.",
+    "Third-Person FOV": "3인칭 시야각",
+    "[Default: 80.0] The FOV in third-person.": "[기본값: 80.0] 3인칭 시점의 시야각입니다.",
+    "Viewmodel FOV": "1인칭 팔 시야각",
+    "[Default: 80.0] The viewmodel FOV; for arms in first-person.": "[기본값: 80.0] 1인칭 시점에서 보이는 팔의 시야각입니다.",
+    "Pip-Boy FOV": "핍보이 시야각",
+    "[Default: 80.0] The FOV for the Pip-Boy.": "[기본값: 80.0] 핍보이를 볼 때의 시야각입니다.",
+    "Terminal FOV": "터미널 시야각",
+    "[Default: 80.0] The FOV for terminals.": "[기본값: 80.0] 터미널을 사용할 때의 시야각입니다.",
+    "Camera Distance": "카메라 거리",
+    "[Default: 15.0] The camera collision distance. Lower values may cause visual bugs, like sun flickering, but can fix camera object clipping at high FOVs.": "[기본값: 15.0] 카메라의 충돌 거리입니다. 값을 낮추면 태양 깜빡임 등의 시각적 오류가 생길 수 있지만, 시야각이 높을 때 카메라가 물체를 뚫고 들어가는 현상을 해결할 수 있습니다.",
+    "Enable First-Person Aim FOV": "1인칭 조준 시야각 사용",
+    "[Default: Off] Whether the First-Person Aim FOV setting is enabled.": "[기본값: 끄기] 1인칭 조준 시야각 설정을 사용할지 정합니다.",
+    "First-Person Aim FOV": "1인칭 조준 시야각",
+    "[Default: 80.0] The FOV when aiming in first-person.": "[기본값: 80.0] 1인칭 시점에서 조준할 때의 시야각입니다.",
+    "Third-Person Aim FOV": "3인칭 조준 시야각",
+    "[Default: 50.0] The FOV when aiming in third-person.": "[기본값: 50.0] 3인칭 시점에서 조준할 때의 시야각입니다."
+  },
+  "Safe Travels_en.json": {
+    "Fast Travel: America Rising 2": "빠른 이동: America Rising 2",
+    "If you can travel to the America Rising 2 Enclave Oil Rig when in a settlement. (Default: ENABLED)": "정착지에서 America Rising 2의 엔클레이브 해상 석유 시추 시설로 이동할 수 있는지 정합니다. (기본값: 활성화됨)",
+    "Caravan Travel Fade Out": "캐러밴 이동 시 화면 전환",
+    "If the game briefly fades to black before Caravan Fast Travel to make it feel smoother. (Default: ENABLED)": "캐러밴으로 빠른 이동을 하기 전에 화면을 잠시 어둡게 하여 자연스럽게 전환합니다. (기본값: 활성화됨)"
+  }
+}
