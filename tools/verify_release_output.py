@@ -42,6 +42,24 @@ def pairs(document):
             for r in document['mappings']}
 
 
+def protected_zimonja(records, plugin):
+    """Resolve source-local master indices, including mod-owned Zimonja markers."""
+    masters = [v.rstrip(b'\0').decode('utf-8').casefold()
+               for sig, v in _subrecords(records[('TES4', '00000000')]) if sig == b'MAST']
+    owners = masters + [plugin.casefold()]
+    protected = []
+    for key, body in records.items():
+        form = int(key[1], 16)
+        index = form >> 24
+        vanilla_id = (index < len(owners) and owners[index] == 'fallout4.esm'
+                      and (form & 0xFFFFFF) in {0x055402, 0x02495A, 0x00DCEC})
+        editor_id = next((v.rstrip(b'\0').decode('utf-8', errors='replace')
+                          for sig, v in _subrecords(body) if sig == b'EDID'), '')
+        if vanilla_id or 'zimonja' in editor_id.casefold():
+            protected.append(key)
+    return protected
+
+
 def verify(output, data):
     report = json.loads((output / 'TMR-Korean-Patcher-report.json').read_text(encoding='utf-8'))
     installation = tmrkr.Installation(Path(report['mo2_root']), report['profile'])
@@ -64,6 +82,10 @@ def verify(output, data):
         _, translated, _, _ = inspect(target)
         if headers(source) != headers(target) or list(original) != list(translated):
             raise ValueError(f"Header or record order changed: {row['plugin']}")
+        protected = protected_zimonja(original, row['plugin'])
+        for key in protected:
+            if original[key] != translated[key]:
+                raise ValueError(f"Protected Zimonja record changed: {row['plugin']} {key}")
         changes = Counter()
         for key, body in original.items():
             left = list(_subrecords(body))
@@ -84,14 +106,12 @@ def verify(output, data):
                 if before_text != translated_text and (before_text, translated_text) not in approved:
                     raise ValueError(f"Unapproved text replacement: {row['plugin']} {key} {sig}")
                 changes[sig.decode()] += 1
-            if key in {('LCTN', '00055402'), ('REFR', '0002495A'), ('CELL', '0000DCEC')}:
-                if body != translated[key]:
-                    raise ValueError(f"Protected Zimonja record changed: {row['plugin']} {key}")
         if offset_tables(target):
             raise ValueError(f"World index remains: {row['plugin']}")
         results.append({'plugin': row['plugin'], 'text_fields': dict(changes),
                         'headers_preserved': True, 'records_preserved': True,
-                        'nontext_preserved': True})
+                        'nontext_preserved': True,
+                        'protected_zimonja_records': [list(k) for k in protected]})
     return results
 
 

@@ -85,6 +85,57 @@ class BackendTests(unittest.TestCase):
             self.assertEqual(self.run_backend(source, mapping, output)["status"], "no_changes")
             self.assertFalse(output.exists())
 
+    def test_all_zimonja_ids_and_mod_owned_marker_are_preserved(self):
+        # Exercise the FormKey/EditorID guard using ordinary top-level records.
+        # Actual CELL/REFR bytes are separately audited in the distribution ZIP.
+        protected = [
+            (b'LCTN', 0x055402, b'LocationWithoutZName'),
+            (b'LCTN', 0x00DCEC, b'CellWithoutZName'),
+            (b'LCTN', 0x02495A, b'MarkerWithoutZName'),
+            (b'LCTN', 0x01000801, b'UFO4POutpostZimonjaFTMarker'),
+        ]
+        groups = {}
+        raw_records = []
+        for signature, form, editor_id in protected:
+            body = sub(b'EDID', editor_id + b'\0') + sub(b'FULL', b'Outpost Zimonja\0')
+            raw = record(signature, form, body)
+            raw_records.append(raw)
+            groups.setdefault(signature, []).append(raw)
+        groups[b'LCTN'].append(record(b'LCTN', 0x055403,
+            sub(b'EDID', b'SafeLocation\0') + sub(b'FULL', b'Safe Location\0')))
+        header = record(b'TES4', 0, sub(b'HEDR', struct.pack('<fII', 1.0, 5, 0x802))
+            + sub(b'MAST', b'Fallout4.esm\0') + sub(b'DATA', bytes(8)))
+        fixture_bytes = header
+        for signature, children in groups.items():
+            body = b''.join(children)
+            fixture_bytes += b'GRUP' + struct.pack('<I', len(body) + 24) + signature + bytes(12) + body
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / 'Synthetic.esp'
+            source.write_bytes(fixture_bytes)
+            protected_rows = []
+            for signature, form, _ in protected:
+                r = row(f'{form & 0xFFFFFF:06X}', 'Outpost Zimonja', '지몬자 초소')
+                r.update(record=signature.decode(), owner='Synthetic.esp' if form >> 24 else 'Fallout4.esm')
+                protected_rows.append(r)
+            rows = protected_rows + [row('055403', 'Safe Location', '안전한 장소')]
+            for mode in ('direct', 'fallback'):
+                with self.subTest(mode=mode):
+                    mapping = root / f'{mode}.json'
+                    bank = root / 'bank.json'
+                    mapping.write_text(json.dumps({'schema_version': 1, 'target': source.name,
+                        'mappings': rows if mode == 'direct' else []}), encoding='utf-8')
+                    bank.write_text(json.dumps({'schema_version': 1, 'mappings': rows}), encoding='utf-8')
+                    output = root / mode / source.name
+                    detail = self.run_backend(source, mapping, output, bank if mode == 'fallback' else None)
+                    self.assertEqual(detail['changed'], 1)
+                    self.assertEqual(detail['protected_records'], 4)
+                    saved = output.read_bytes()
+                    for raw in raw_records:
+                        self.assertIn(raw, saved)
+                    self.assertNotIn('지몬자 초소'.encode(), saved)
+            self.assertEqual(source.read_bytes(), fixture_bytes)
+
     def test_localized_string_ids_are_not_rewritten_as_inline_text(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
