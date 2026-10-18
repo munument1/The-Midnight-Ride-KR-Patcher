@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "package": "TMR-Korean-Patcher-v1.0.4.zip",
+  "package_sha256": "25e7d563f3dcfb23d575498050d7f5926c99b6857f507b35a963dedabb81f430",
+  "status": "passed_file_audit",
+  "in_game_validation": "not_performed",
+  "plugins": [
+    {
+      "plugin": "unofficial fallout 4 patch.esp",
+      "source_sha256": "3814c2f64f2df27d3fa389c8e7d6f6431ef463de72e7c85fe94524e54faab658",
+      "payload_sha256": "1e58d1a533a90f601de8c7a9a16f68311e53ea8a57e8b5e3955e596ebcf29427",
+      "records_including_TES4": 31749,
+      "byte_identical_records": 22334,
+      "changed_text_fields": {
+        "FULL": 2443,
+        "DNAM": 35,
+        "ATTX": 19,
+        "DESC": 636,
+        "ONAM": 19,
+        "SHRT": 39,
+        "WNAM": 231,
+        "BTXT": 238,
+        "ITXT": 1256,
+        "UNAM": 1114,
+        "NAM0": 160,
+        "RNAM": 888,
+        "NAM1": 9106,
+        "CNAM": 1174,
+        "NNAM": 1399,
+        "EPF2": 2,
+        "BPTN": 6
+      },
+      "world_indexes_removed": {},
+      "world_indexes_remaining": 0,
+      "record_and_group_headers_preserved_except_size": true,
+      "nontext_raw_fields_and_XXXX_preserved": true,
+      "protected_zimonja": [
+        {
+          "record": "REFR",
+          "form_id": "0002495A",
+          "editor_id": "",
+          "names": [
+            "Outpost Zimonja"
+          ],
+          "raw_record_identical": true
+        },
+        {
+          "record": "REFR",
+          "form_id": "1004E64B",
+          "editor_id": "UFO4POutpostZimonjaFTMarker",
+          "names": [],
+          "raw_record_identical": true
+        },
+        {
+          "record": "CELL",
+          "form_id": "0000DCEC",
+          "editor_id": "RelayOutpostZimonja",
+          "names": [],
+          "raw_record_identical": true
+        },
+        {
+          "record": "LCTN",
+          "form_id": "00055402",
+          "editor_id": "RelayTowerZimonjaLocation",
+          "names": [
+            "Outpost Zimonja"
+          ],
+          "raw_record_identical": true
+        }
+      ]
+    },
+    {
+      "plugin": "ppf.esm",
+      "source_sha256": "3e56d34a9f182569e5dc473c13201923e1a1cf2bc5793523f230ac7a1f2bee58",
+      "payload_sha256": "fa3129a448aa70970c04411a925bc30a08d930dad73f52c6cc97b53ecb690c35",
+      "records_including_TES4": 25440,
+      "byte_identical_records": 25201,
+      "changed_text_fields": {
+        "FULL": 239
+      },
+      "world_indexes_removed": {
+        "OFST": 9,
+        "CLSZ": 9
+      },
+      "world_indexes_remaining": 0,
+      "record_and_group_headers_preserved_except_size": true,
+      "nontext_raw_fields_and_XXXX_preserved": true,
+      "protected_zimonja": [
+        {
+          "record": "CELL",
+          "form_id": "0000DCEC",
+          "editor_id": "RelayOutpostZimonja",
+          "names": [],
+          "raw_record_identical": true
+        }
+      ]
+    },
+    {
+      "plugin": "prp.esp",
+      "source_sha256": "3bf4c639c777feac118e4e88f0e945a8bceec6f2be217195c35d08859dcedf38",
+      "payload_sha256": "c3f5f1a17c86b364e7791ba7d7a7144b0e1166f633e5aaa959e427d5559c5465",
+      "records_including_TES4": 8277,
+      "byte_identical_records": 7948,
+      "changed_text_fields": {
+        "FULL": 329
+      },
+      "world_indexes_removed": {
+        "OFST": 8,
+        "CLSZ": 8
+      },
+      "world_indexes_remaining": 0,
+      "record_and_group_headers_preserved_except_size": true,
+      "nontext_raw_fields_and_XXXX_preserved": true,
+      "protected_zimonja": [
+        {
+          "record": "CELL",
+          "form_id": "0000DCEC",
+          "editor_id": "RelayOutpostZimonja",
+          "names": [],
+          "raw_record_identical": true
+        }
+      ]
+    }
+  ]
+}
