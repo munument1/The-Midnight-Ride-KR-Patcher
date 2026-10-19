@@ -113,14 +113,13 @@ class App:
             else:
                 _, target, report = event
                 self.output = target
-                exact = sum(x["status"] == "exact_payload" for x in report["plugins"])
-                fallback = sum(x["status"] in {"updated_fallback", "new_inherited"}
+                fallback = sum(x["status"] == "translated_current_source"
                                for x in report["plugins"])
                 skipped = sum(
                     x["status"] in {"known_no_translation_needed", "updated_no_match", "new_no_match", "excluded"}
                     for x in report["plugins"])
                 self.status.set(
-                    f"완료: 빠른 적용 {exact} · 사전 번역 {fallback} · "
+                    f"완료: 설치본 사전 번역 {fallback} · "
                     f"번역 불필요/대응 없음 {skipped}\n"
                     f"MCM {len(report['mcm'])}개 · Interface {len(report['interface'])}개\n"
                     f"{target}\n"
@@ -155,18 +154,15 @@ def packaged_self_test(mo2_root: str) -> int:
             raise RuntimeError("Output self-test failed")
         if not (output / "mods" / BASE_MOD / "Strings").is_dir():
             raise RuntimeError("FO4 KOREAN MO2 mod was not generated")
-        if not any(x["status"] == "exact_payload"
-                   or x.get("detail", {}).get("text_roundtrip_verified") is True
+        if not any(x.get("detail", {}).get("text_roundtrip_verified") is True
                    for x in report["plugins"]):
             raise RuntimeError("No verified plugin translation was generated")
-        entries = {row["name"].casefold(): row for row in
-                   json.loads((data / "catalog.json").read_text(encoding="utf-8-sig"))["plugins"]}
+        if any(x["status"] == "exact_payload" for x in report["plugins"]):
+            raise RuntimeError("Prebuilt plugin was used")
         for item in report["plugins"]:
-            if item["status"] == "exact_payload":
-                entry = entries[item["plugin"].casefold()]
-                if (entry.get("payload_encoding") != "utf-8"
-                        or entry.get("text_roundtrip_verified") is not True):
-                    raise RuntimeError("Unverified exact payload was used")
+            if item["status"] == "translated_current_source" and (
+                    item.get("detail", {}).get("final_binary_verified") is not True):
+                raise RuntimeError("Final binary verification is missing")
         if report["base_files"] < 1:
             raise RuntimeError("Bundled Korean resource path was not exercised")
         for item in report["interface"]:

@@ -160,7 +160,7 @@ class PluginSafetyTests(unittest.TestCase):
                 backend.assert_called_once()
                 self.assertEqual(report["plugins"][0]["status"], "updated_no_match")
 
-    def test_current_policy_payload_with_remaining_world_index_is_rejected(self):
+    def test_current_policy_cached_plugin_is_ignored(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             source = root / "Synthetic.esp"
@@ -183,9 +183,13 @@ class PluginSafetyTests(unittest.TestCase):
             winner = {"provider": "Example", "path": source.name}
             installation = SimpleNamespace(root=root, profile="test", active=[source.name],
                 providers={source.name.casefold(): [winner]}, warnings=[], source=lambda _: source)
-            with patch("tmrkr_output.tmrkr.Installation", return_value=installation):
-                with self.assertRaisesRegex(ValueError, "Unstripped world-index payload"):
-                    build_output(root, base, catalog_dir, root / "Output")
+            with patch("tmrkr_output.tmrkr.Installation", return_value=installation), \
+                    patch("tmrkr_output._run_fallback", return_value=(
+                        {"status": "no_changes", "plugin_policy_version": PLUGIN_POLICY_VERSION}, None)) as backend:
+                report = build_output(root, base, catalog_dir, root / "Output")
+                backend.assert_called_once()
+                self.assertEqual(report["plugins"][0]["changed"], 0)
+                self.assertFalse(list((root / "Output").rglob("*.esp")))
 
 
 if __name__ == "__main__":

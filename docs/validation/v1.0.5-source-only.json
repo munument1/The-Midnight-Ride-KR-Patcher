@@ -1,0 +1,496 @@
+{
+  "version": "1.0.5",
+  "plugin_generation": "installed_source_only",
+  "zip_bytes": 74091621,
+  "zip_sha256": "88ce345bae8e029de1c44ff2ac42a7ec4c684279ce2d9f2f9ff3f3d03809d19c",
+  "plugins_in_zip": [],
+  "tests_passed": 42,
+  "tests_skipped": 0,
+  "runtime_plugins": 39,
+  "changed_text_fields": 24137,
+  "packaged_smoke_profile": "Safe Travels.esm",
+  "packaged_smoke_exit_code": 0,
+  "preservation": [
+    {
+      "plugin": "unofficial fallout 4 patch.esp",
+      "text_fields": {
+        "FULL": 2443,
+        "DNAM": 35,
+        "ATTX": 19,
+        "DESC": 636,
+        "ONAM": 19,
+        "SHRT": 39,
+        "WNAM": 231,
+        "BTXT": 238,
+        "ITXT": 1256,
+        "UNAM": 1114,
+        "NAM0": 160,
+        "RNAM": 888,
+        "NAM1": 9106,
+        "CNAM": 1174,
+        "NNAM": 1399,
+        "EPF2": 2,
+        "BPTN": 6
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": [
+        [
+          "REFR",
+          "0002495A"
+        ],
+        [
+          "REFR",
+          "1004E64B"
+        ],
+        [
+          "CELL",
+          "0000DCEC"
+        ],
+        [
+          "LCTN",
+          "00055402"
+        ]
+      ]
+    },
+    {
+      "plugin": "community fixes merged.esp",
+      "text_fields": {
+        "FULL": 1431,
+        "DNAM": 35,
+        "ATTX": 17,
+        "DESC": 551,
+        "ONAM": 14,
+        "SHRT": 32,
+        "CNAM": 46,
+        "NNAM": 54,
+        "EPF2": 2,
+        "ANAM": 2,
+        "ITXT": 8,
+        "WNAM": 678
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "TMR_GlitchfinderAIO.esm",
+      "text_fields": {
+        "FULL": 3,
+        "BPTN": 6
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "fakeInt.esp",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": [
+        [
+          "CELL",
+          "0000DCEC"
+        ]
+      ]
+    },
+    {
+      "plugin": "fakeInt_Boston.esp",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "fakeInt_DLC.esp",
+      "text_fields": {
+        "FULL": 5
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "BloodFixes.esm",
+      "text_fields": {
+        "FULL": 105
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Safe Travels.esm",
+      "text_fields": {
+        "FULL": 2,
+        "WNAM": 1,
+        "BTXT": 1,
+        "ITXT": 30,
+        "RNAM": 25,
+        "DESC": 5
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "YouAndWhatArmy2.esm",
+      "text_fields": {
+        "FULL": 143,
+        "ONAM": 1,
+        "NAM1": 13,
+        "DESC": 3
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Diamond City Supplements.esm",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Enhanced Vanilla Water.esm",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "ppf.esm",
+      "text_fields": {
+        "FULL": 239
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": [
+        [
+          "CELL",
+          "0000DCEC"
+        ]
+      ]
+    },
+    {
+      "plugin": "FOLIP - Master.esm",
+      "text_fields": {
+        "FULL": 202
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": [
+        [
+          "CELL",
+          "0000DCEC"
+        ]
+      ]
+    },
+    {
+      "plugin": "Flutter Flicker Fixer For Foliage.esp",
+      "text_fields": {
+        "FULL": 26
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Extended Fake Interior - CC Enclave Remnants Patch.esp",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "GeneralAtomicsMrGutsyGuards.esp",
+      "text_fields": {
+        "NNAM": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "GA Galleria Gutsy Voice Fix - UFO4P Patch.esp",
+      "text_fields": {
+        "NNAM": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Less Annoying Berry Mentats.esp",
+      "text_fields": {
+        "FULL": 2
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "mr Loot Logic and Reduction.esp",
+      "text_fields": {
+        "FULL": 33
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Loot Logic and Reduction - UFO4P Patch.esp",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Complex Vendors.esp",
+      "text_fields": {
+        "FULL": 46,
+        "DESC": 22
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "IntegratedAddons.esp",
+      "text_fields": {
+        "FULL": 66,
+        "DESC": 16,
+        "CNAM": 21,
+        "NNAM": 37,
+        "NAM1": 13,
+        "RNAM": 4
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Keep Radiants In Commonwealth.esp",
+      "text_fields": {
+        "FULL": 71,
+        "NNAM": 104,
+        "CNAM": 130
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "WhoIsTheGeneral.esp",
+      "text_fields": {
+        "NAM1": 26,
+        "FULL": 22,
+        "CNAM": 105,
+        "NNAM": 84
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "WTG - KRIC Patch.esp",
+      "text_fields": {
+        "FULL": 13,
+        "CNAM": 67,
+        "NNAM": 52
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "ReinforcementsAndRetribution.esp",
+      "text_fields": {
+        "FULL": 23,
+        "DESC": 15
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "MoreWeathervanes.esp",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "MoreDCBounties.esp",
+      "text_fields": {
+        "FULL": 80,
+        "DESC": 26,
+        "NNAM": 40
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Legendary Mutation Messages Fix.esp",
+      "text_fields": {
+        "FULL": 4,
+        "DESC": 4
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Lightweight Lighting.esp",
+      "text_fields": {
+        "FULL": 2,
+        "RDMP": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "FO4ParticlePatch.esp",
+      "text_fields": {
+        "FULL": 8
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "DiamondCityBillboards.esp",
+      "text_fields": {
+        "FULL": 1
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "GoodneighborView.esp",
+      "text_fields": {
+        "FULL": 2
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "prp.esp",
+      "text_fields": {
+        "FULL": 329
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": [
+        [
+          "CELL",
+          "0000DCEC"
+        ]
+      ]
+    },
+    {
+      "plugin": "FO4LODGen.esp",
+      "text_fields": {
+        "FULL": 72
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "FOLIP - New LODs.esp",
+      "text_fields": {
+        "FULL": 40
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Far Harbor 3d Tree LODs.esp",
+      "text_fields": {
+        "FULL": 7
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "Optimized Vanilla Tree LODs.esp",
+      "text_fields": {
+        "FULL": 83
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    },
+    {
+      "plugin": "FOLIP - Patch.esp",
+      "text_fields": {
+        "FULL": 12
+      },
+      "headers_preserved": true,
+      "records_preserved": true,
+      "nontext_preserved": true,
+      "protected_zimonja_records": []
+    }
+  ]
+}

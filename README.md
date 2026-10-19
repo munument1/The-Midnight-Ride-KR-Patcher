@@ -8,7 +8,15 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 
 > 이 프로젝트는 ModdingLinked 또는 The Midnight Ride 제작진의 공식 번역/도구가 아닙니다.
 
-## v1.0.4 — 최종 파일 검증 보강
+## v1.0.5 — 설치본에서 직접 번역
+
+- 배포 ZIP에서 완성된 ESP/ESM/ESL 플러그인을 모두 제거했습니다.
+- 원본 해시가 같아도 내장 파일을 복사하지 않고, 사용자가 설치한 파일에 사전을 적용합니다.
+- 업데이트로 추가된 레코드와 비번역 데이터는 현재 설치본에서 보존합니다. 사전의 원문과 일치하지 않는 문구는 예전 번역으로 덮어쓰지 않습니다.
+- 생성 파일 전체를 현재 원본과 대조하는 검증과 지몬자·PRP 보호 정책은 유지합니다.
+- 최신 설치 방법과 검증 범위는 [v1.0.5 릴리즈 노트](docs/releases/v1.0.5.md)를 확인하세요.
+
+## v1.0.4 — 최종 파일 검증 보강 (이전 버전)
 
 - xTranslator 1.7.3 제작자가 명시한 OFST/CLSZ 제거 정책을 확인하고 유지합니다.
 - 공개 GitHub 소스는 1.6.0이므로 최신 구현을 소스로 직접 확인했다는 주장은 하지 않습니다.
@@ -57,7 +65,7 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 
 - Fallout 4 본편 + 공식 DLC 한국어 리소스를 `FO4 KOREAN` 모드로 출력
 - TMR 활성 플러그인 자동 탐지
-- 현재 검증 버전은 미리 생성한 번역 payload로 빠르게 적용
+- 모든 플러그인은 현재 설치본에 번역 사전을 적용하여 생성
 - 플러그인 업데이트 또는 신규 플러그인 감지 시 레코드 기반 fallback 번역
 - 모드 전용 SST가 있으면 모드 전용 번역을 최우선 적용
 - 나머지 override 레코드는 Fallout4.esm + 공식 DLC 번역을 상속
@@ -79,7 +87,7 @@ v1.0.2는 나머지 57개를 검사해 원본 데이터 보존을 검증한 exac
 
 ## 사용 방법
 
-1. GitHub Releases에서 `TMR-Korean-Patcher-v1.0.4.zip`을 내려받아 압축을 풉니다.
+1. GitHub Releases에서 `TMR-Korean-Patcher-v1.0.5.zip`을 내려받아 압축을 풉니다.
 2. `TMR-Korean-Patcher.exe`를 실행합니다.
 3. `ModOrganizer.ini`가 있는 TMR MO2 폴더를 선택합니다.
 4. **Output 생성**을 누릅니다.

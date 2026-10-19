@@ -2,7 +2,8 @@
 
 The previous release supplies the base Korean resources, validated backend and
 translation banks. New source-controlled dictionaries are merged before building
-an Output; changed payloads are promoted only after the normal safety checks.
+an Output. Only dictionaries and runtime resources are packaged; translated
+plugins remain in the local validation Output.
 """
 from __future__ import annotations
 
@@ -15,8 +16,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import tmrkr
-from tmrkr_output import build_output, _provider_target, _contained
-from tmrkr_plugin_safety import PLUGIN_POLICY_VERSION, offset_tables
+from tmrkr_output import build_output
+from tmrkr_plugin_safety import PLUGIN_POLICY_VERSION
 
 
 def read(path):
@@ -28,24 +29,38 @@ def write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def release_copy_ignore(directory, names):
+    return [name for name in names if name.casefold() in {"exact-plugins", "exact-sidecars"}
+            or Path(name).suffix.casefold() in tmrkr.PLUGIN_SUFFIXES]
+
+
 def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path, resume=False, backend=None):
     if not resume and (package.exists() or output.exists()):
         raise FileExistsError("Use new package and Output directories")
     if not resume:
-        shutil.copytree(previous, package)
+        # Import historical resources without carrying forward whole plugins.
+        shutil.copytree(previous, package, ignore=release_copy_ignore)
     data = package / "TranslationData"
     if backend:
         if resume:
             raise ValueError("A new backend requires a fresh Output")
         shutil.copy2(backend, data / "Backend/TmrPluginTranslator.exe")
     catalog = read(data / "catalog.json")
+    catalog["schema_version"] = 2
+    catalog["plugin_generation"] = "installed_source_only"
+    for entry in catalog["plugins"]:
+        for key in ("payload", "payload_sha256", "payload_encoding", "sidecar_dir",
+                    "text_roundtrip_verified", "final_binary_verified", "world_index_policy"):
+            entry.pop(key, None)
     catalog["version"] = tmrkr.VERSION
     catalog["profile_built_from"] = profile
+    dictionaries_changed = False
     for path in (ROOT / "TranslationData/updates/direct-maps").glob("*.json"):
         relative = f"direct-maps/{path.name}"
         document = read(path)
         target = data / relative
         changed = not target.is_file() or read(target) != document
+        dictionaries_changed |= changed
         write(target, document)
         for entry in catalog["plugins"]:
             if entry["name"].casefold() == document["target"].casefold():
@@ -64,8 +79,8 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
             catalog["interface"].append({"path": path, "mapping": relative})
     write(data / "catalog.json", catalog)
     if resume:
-        if any(e.get("payload") and not e.get("plugin_policy_version") for e in catalog["plugins"]):
-            raise ValueError("A direct dictionary changed; generate a fresh Output")
+        if dictionaries_changed:
+            raise ValueError("A dictionary changed; generate a fresh Output")
         report = read(output / "TMR-Korean-Patcher-report.json")
         installation = tmrkr.Installation(mo2, profile)
         if report["profile"] != profile or Path(report["mo2_root"]).resolve() != mo2.resolve():
@@ -88,36 +103,19 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
         if status.startswith("skipped_") or status == "source_missing":
             raise RuntimeError(f"Resolve skipped/missing plugin before release: {name}: {row}")
         entry = dict(old.get(name.casefold(), {}))
-        for key in ("payload", "payload_sha256", "sidecar_dir"):
-            entry.pop(key, None)
         entry.update(name=name, source_sha256=row["source_sha256"],
                      plugin_policy_version=PLUGIN_POLICY_VERSION,
                      baseline_status="translated" if row["changed"] else "no_changes",
                      changed=row["changed"])
         if row["changed"]:
             detail = row.get("detail", {})
-            if status != "exact_payload" and not detail.get("utf8_text_verified"):
+            if not detail.get("utf8_text_verified"):
                 raise ValueError(f"Unverified UTF-8 output: {name}")
-            if status != "exact_payload" and (detail.get("final_binary_verified") is not True
+            if (detail.get("final_binary_verified") is not True
                     or detail.get("world_index_policy") != "strip_wrld_ofst_clsz_v1"):
                 raise ValueError(f"Unverified final binary: {name}")
-            payload = _provider_target(output, {"provider": row["provider"], "path": row["relative_path"]})
-            if not payload.is_file() or offset_tables(payload):
-                raise ValueError(f"Missing or unsafe payload: {name}")
-            relative = f"exact-plugins/{name}"
-            target = _contained(data, relative)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(payload, target)
-            entry.update(payload=relative, payload_sha256=tmrkr.sha256(target),
-                         payload_encoding="utf-8", text_roundtrip_verified=True,
-                         final_binary_verified=True, world_index_policy="strip_wrld_ofst_clsz_v1")
         entries.append(entry)
     catalog["plugins"] = entries
-    # Retain dictionaries for removed optional mods, but remove stale exact files.
-    used = {e["payload"].casefold() for e in entries if "payload" in e}
-    for path in (data / "exact-plugins").iterdir():
-        if path.is_file() and path.relative_to(data).as_posix().casefold() not in used:
-            path.unlink()
     write(data / "catalog.json", catalog)
     write(package / "BUILD-INFO.json", {
         "version": tmrkr.VERSION,
@@ -128,7 +126,7 @@ def refresh(previous: Path, mo2: Path, profile: str, package: Path, output: Path
         "interface": [{k: r[k] for k in ("path", "matched", "missing")}
                       for r in report["interface"]],
     })
-    print(json.dumps({"plugins": len(entries), "payloads": len(used),
+    print(json.dumps({"plugins": len(entries), "plugin_generation": "installed_source_only",
                       "interface": report["interface"], "warnings": report["warnings"]}, ensure_ascii=False))
 
 
@@ -139,7 +137,7 @@ if __name__ == "__main__":
     ap.add_argument("--profile", default="The Midnight Ride Extended")
     ap.add_argument("--package", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
-    ap.add_argument("--resume", action="store_true", help="Promote an existing Output after verifying source hashes")
+    ap.add_argument("--resume", action="store_true", help="Record an existing validated Output after verifying source hashes")
     ap.add_argument("--backend-exe", type=Path, help="Use a newly published self-contained backend")
     args = ap.parse_args()
     refresh(args.previous, args.mo2_root, args.profile, args.package, args.output, args.resume, args.backend_exe)

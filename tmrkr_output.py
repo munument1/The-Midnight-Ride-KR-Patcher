@@ -10,7 +10,7 @@ import tempfile
 
 import tmrkr
 from tmrkr_mcm import translate_mcm_json
-from tmrkr_plugin_safety import plugin_skip_reason, PLUGIN_POLICY_VERSION, offset_tables
+from tmrkr_plugin_safety import plugin_skip_reason, PLUGIN_POLICY_VERSION
 
 OFFICIAL_MASTERS = {
     "fallout4.esm", "dlcrobot.esm", "dlcworkshop01.esm", "dlccoast.esm",
@@ -115,23 +115,6 @@ def _plugin_map(catalog_dir: Path, entry: dict) -> Path | None:
     return path if path.is_file() else None
 
 
-def _verified_exact_payload(catalog_dir: Path, entry: dict) -> Path | None:
-    # Legacy releases lost Korean text at serialization. Only payloads created
-    # by the UTF-8 backend and checked by a text roundtrip may bypass translation.
-    if (entry.get("payload_encoding") != "utf-8"
-            or entry.get("text_roundtrip_verified") is not True
-            or entry.get("final_binary_verified") is not True
-            or entry.get("world_index_policy") != "strip_wrld_ofst_clsz_v1"
-            or not entry.get("payload")):
-        return None
-    payload = _contained(catalog_dir, entry["payload"])
-    if not payload.is_file():
-        return None
-    if tmrkr.sha256(payload) != entry.get("payload_sha256"):
-        raise ValueError(f"Payload hash mismatch: {entry.get('name', payload.name)}")
-    return payload
-
-
 def _run_fallback(source: Path, plugin: str, entry: dict | None,
                   catalog_dir: Path, temp: Path) -> tuple[dict, Path | None]:
     backend = _contained(catalog_dir, "Backend/TmrPluginTranslator.exe")
@@ -186,7 +169,7 @@ def build_output(mo2_root: Path, base_package: Path, catalog_dir: Path,
                  output: Path, profile: str | None = None) -> dict:
     installation = tmrkr.Installation(mo2_root, profile)
     catalog = _read_json(catalog_dir / "catalog.json")
-    if catalog.get("schema_version") != 1:
+    if catalog.get("schema_version") not in (1, 2):
         raise ValueError("Unsupported catalog")
 
     for required in ("Interface", "Strings"):
@@ -207,6 +190,7 @@ def build_output(mo2_root: Path, base_package: Path, catalog_dir: Path,
         "profile": installation.profile,
         "base_package": "bundled:FO4_AE_1.11.191.Kor",
         "output": str(output),
+        "plugin_generation": "installed_source_only",
         "plugins": [],
         "base_files": 0,
         "mcm": [],
@@ -255,31 +239,11 @@ def build_output(mo2_root: Path, base_package: Path, catalog_dir: Path,
                 report["warnings"].append(f"{plugin}: {reason}")
                 continue
 
-            if (entry and source_hash == entry.get("source_sha256")
-                    and entry.get("plugin_policy_version") == PLUGIN_POLICY_VERSION):
-                payload = _verified_exact_payload(catalog_dir, entry)
-                if entry.get("baseline_status") == "translated" and payload is not None:
-                    if offset_tables(payload):
-                        raise ValueError(f"Unstripped world-index payload: {plugin}; rebuild release data")
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(payload, target)
-                    sidecars = 0
-                    if entry.get("sidecar_dir"):
-                        sidecars = _copy_en_sidecars(
-                            _contained(catalog_dir, entry["sidecar_dir"]),
-                            target.parent / "Strings")
-                    result.update(status="exact_payload", changed=entry.get("changed", 0), sidecars=sidecars)
-                    report["plugins"].append(result)
-                    continue
-                elif entry.get("baseline_status") != "translated":
-                    result.update(status="known_no_translation_needed", changed=0)
-                    report["plugins"].append(result)
-                    continue
-
-                # A missing or unverified exact payload must use direct/fallback,
-                # even when the original plugin's hash is a catalog match.
-
+            # Always translate the installed source. Legacy catalog payloads and
+            # baseline hashes never authorize copying a prebuilt plugin.
             detail, translated = _run_fallback(source, plugin, entry, catalog_dir, temp)
+            if tmrkr.sha256(source) != source_hash:
+                raise RuntimeError(f"{plugin}: source changed during translation; retry after closing mod tools")
             if detail.get("status", "").startswith("skipped_"):
                 result.update(status=detail["status"], changed=0, detail=detail)
                 report["warnings"].append(f"{plugin}: {detail.get('reason', detail['status'])}")
@@ -290,7 +254,7 @@ def build_output(mo2_root: Path, base_package: Path, catalog_dir: Path,
                 shutil.copy2(translated, target)
                 sidecars = _copy_en_sidecars(translated.parent, target.parent / "Strings")
                 result.update(
-                    status="updated_fallback" if entry else "new_inherited",
+                    status="translated_current_source",
                     changed=detail.get("changed", 0), sidecars=sidecars, detail=detail)
             report["plugins"].append(result)
 
