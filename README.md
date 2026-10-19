@@ -8,6 +8,10 @@ Fallout 4 모딩 가이드 **The Midnight Ride (TMR)** 환경에 한국어 번�
 
 > 이 프로젝트는 ModdingLinked 또는 The Midnight Ride 제작진의 공식 번역/도구가 아닙니다.
 
+배포에는 원작 모드 플러그인이나 완성된 번역 플러그인을 포함하지 않습니다. 번역 사전의 레코드·필드·원문·번역문 매핑을 현재 설치된 원본에 적용하고, 결과 파일은 사용자의 컴퓨터에서만 생성합니다. 원작 모드는 별도로 설치해야 합니다.
+
+완성 플러그인이 포함됐던 v1.0.1·v1.0.2·v1.0.4의 실행 ZIP은 배포에서 철회했습니다. [최신 릴리즈](https://github.com/munument1/The-Midnight-Ride-KR-Patcher/releases/latest)를 사용하세요.
+
 ## v1.0.5 — 설치본에서 직접 번역
 
 - 배포 ZIP에서 완성된 ESP/ESM/ESL 플러그인을 모두 제거했습니다.
