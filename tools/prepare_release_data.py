@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import tmrkr
-from tmrkr_plugin_safety import plugin_skip_reason, PLUGIN_POLICY_VERSION, offset_tables
+from tmrkr_plugin_safety import plugin_skip_reason
 from tmrkr_sst import read_sst, custom_text_mapping
 
 
@@ -41,23 +41,6 @@ INTERFACE_TARGETS = [
 def write_json(path: Path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-
-def copy_exact_sidecars(plugin: str, plugins_root: Path, target_root: Path) -> str | None:
-    strings = plugins_root / "Strings"
-    if not strings.is_dir():
-        return None
-    stem = Path(plugin).stem.casefold()
-    matches = [p for p in strings.iterdir()
-               if p.is_file() and p.name.casefold().startswith(stem + "_en.")]
-    if not matches:
-        return None
-    rel = Path("exact-sidecars") / Path(plugin).stem
-    dest = target_root / rel / "Strings"
-    dest.mkdir(parents=True, exist_ok=True)
-    for path in matches:
-        shutil.copy2(path, dest / path.name)
-    return rel.as_posix()
 
 
 def main() -> int:
@@ -89,7 +72,6 @@ def main() -> int:
     fallback_dir.mkdir()
     shutil.copy2(args.fallback_bank, fallback_dir / "fallout4-base-dlc-fallback.json")
 
-    exact_dir = out / "exact-plugins"
     maps_dir = out / "direct-maps"
     plugins = []
 
@@ -117,29 +99,6 @@ def main() -> int:
             "baseline_status": row["status"],
             "plugin_policy_version": row.get("detail", {}).get("plugin_policy_version"),
         }
-
-        payload_source = args.final_build / "plugins" / plugin
-        if row["status"] == "translated" and payload_source.is_file():
-            if entry["plugin_policy_version"] != PLUGIN_POLICY_VERSION:
-                raise ValueError(f"Outdated payload: {plugin}; rebuild with current backend")
-            if offset_tables(payload_source):
-                raise ValueError(f"Unstripped world-index payload: {plugin}")
-            if row.get("detail", {}).get("utf8_text_verified") is not True:
-                raise ValueError(f"Unverified UTF-8 payload: {plugin}")
-            if row.get("detail", {}).get("final_binary_verified") is not True:
-                raise ValueError(f"Unverified final binary: {plugin}")
-            entry.update(payload_encoding="utf-8", text_roundtrip_verified=True,
-                         final_binary_verified=True, world_index_policy="strip_wrld_ofst_clsz_v1")
-            payload_rel = Path("exact-plugins") / plugin
-            payload_target = out / payload_rel
-            payload_target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(payload_source, payload_target)
-            entry["payload"] = payload_rel.as_posix()
-            entry["payload_sha256"] = tmrkr.sha256(payload_target)
-            entry["changed"] = row.get("detail", {}).get("changed", 0)
-            sidecar = copy_exact_sidecars(plugin, args.final_build / "plugins", out)
-            if sidecar:
-                entry["sidecar_dir"] = sidecar
 
         map_source = args.final_build / "_mappings" / f"{plugin}.json"
         if map_source.is_file():
@@ -182,7 +141,8 @@ def main() -> int:
         interface_specs.append({"path": relative, "mapping": rel.as_posix()})
 
     catalog = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "plugin_generation": "installed_source_only",
         "version": tmrkr.VERSION,
         "profile_built_from": args.profile,
         "plugins": plugins,
@@ -197,7 +157,7 @@ def main() -> int:
 
     print(json.dumps({
         "plugins": len(plugins),
-        "exact_payloads": sum("payload" in x for x in plugins),
+        "plugin_generation": "installed_source_only",
         "direct_maps": sum("direct_mapping" in x for x in plugins),
         "mcm": len(mcm_specs),
         "interface": len(interface_specs),

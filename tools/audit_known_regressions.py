@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import tmrkr
 from tmrkr_plugin_safety import offset_tables
+from tmrkr_output import _run_fallback
 from verify_release_output import TEXT_FIELDS, headers, pairs, protected_zimonja, text
 
 TARGETS = ('unofficial fallout 4 patch.esp', 'ppf.esm', 'prp.esp')
@@ -72,16 +73,23 @@ def audit(mo2, profile, package):
             raise ValueError('Expected one release catalog')
         prefix = catalogs[0].removesuffix('catalog.json')
         catalog = json.loads(archive.read(catalogs[0]).decode('utf-8-sig'))
+        data = Path(tmp) / 'TranslationData'
+        for member in archive.namelist():
+            if member.startswith(prefix) and not member.endswith('/'):
+                rel = Path(member[len(prefix):])
+                if rel.is_absolute() or '..' in rel.parts:
+                    raise ValueError('Unsafe ZIP member')
+                dest = data / rel
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(archive.read(member))
         entries = {e['name'].casefold(): e for e in catalog['plugins']}
         bank = pairs(json.loads(archive.read(prefix + 'fallback/fallout4-base-dlc-fallback.json').decode('utf-8-sig')))
         for name in TARGETS:
             source = installation.source(name)
             entry = entries[name]
-            target = Path(tmp) / name
-            target.write_bytes(archive.read(prefix + entry['payload']))
-            if (tmrkr.sha256(source) != entry['source_sha256']
-                    or tmrkr.sha256(target) != entry['payload_sha256']):
-                raise ValueError(f'Source or payload hash mismatch: {name}')
+            detail, target = _run_fallback(source, name, entry, data, Path(tmp))
+            if target is None or detail.get('final_binary_verified') is not True:
+                raise ValueError(f'Runtime translation was not verified: {name}')
             original, translated = records(source), records(target)
             if list(original) != list(translated) or headers(source) != headers(target):
                 raise ValueError(f'Record or header mismatch: {name}')
@@ -129,7 +137,7 @@ def audit(mo2, profile, package):
             if offset_tables(target):
                 raise ValueError(f'Remaining world index: {name}')
             results.append({'plugin': name, 'source_sha256': tmrkr.sha256(source),
-                'payload_sha256': tmrkr.sha256(target), 'records_including_TES4': len(original),
+                'generated_sha256': tmrkr.sha256(target), 'records_including_TES4': len(original),
                 'byte_identical_records': untouched, 'changed_text_fields': dict(changed),
                 'world_indexes_removed': dict(removed), 'world_indexes_remaining': 0,
                 'record_and_group_headers_preserved_except_size': True,

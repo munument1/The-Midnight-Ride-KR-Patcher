@@ -7,49 +7,14 @@ from unittest.mock import patch
 
 import tmrkr
 from tmrkr_output import (BASE_MOD, EXCLUDED_PLUGINS, _contained, _provider_target,
-                          _translate_interface, _verified_exact_payload)
+                          _translate_interface)
 from tmrkr_mcm import translate_mcm_json
 from tmrkr_loose import translate_interface_file
 
 
 class OutputTests(unittest.TestCase):
-    def test_legacy_and_missing_payloads_fall_back(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            payload = root / "old.esp"
-            payload.write_bytes(b"???")
-            entry = {"name": "old.esp", "payload": payload.name, "payload_sha256": tmrkr.sha256(payload)}
-            self.assertIsNone(_verified_exact_payload(root, entry))
-            entry.update(payload_encoding="utf-8", text_roundtrip_verified=True, payload="missing.esp")
-            self.assertIsNone(_verified_exact_payload(root, entry))
-
-    def test_verified_payload_still_requires_matching_hash(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            payload = root / "verified.esp"
-            payload.write_bytes("한국어".encode())
-            entry = {"name": payload.name, "payload": payload.name, "payload_encoding": "utf-8",
-                     "text_roundtrip_verified": True, "payload_sha256": tmrkr.sha256(payload),
-                     "final_binary_verified": True, "world_index_policy": "strip_wrld_ofst_clsz_v1"}
-            self.assertEqual(_verified_exact_payload(root, entry), payload)
-            payload.write_bytes(b"???")
-            with self.assertRaisesRegex(ValueError, "Payload hash mismatch"):
-                _verified_exact_payload(root, entry)
-
-    def test_old_text_only_validation_cannot_bypass_final_binary_verification(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            payload = root / 'old.esp'
-            payload.write_bytes(b'old payload')
-            entry = {'name': payload.name, 'payload': payload.name,
-                     'payload_sha256': tmrkr.sha256(payload),
-                     'payload_encoding': 'utf-8', 'text_roundtrip_verified': True}
-            self.assertIsNone(_verified_exact_payload(root, entry))
-            entry.update(final_binary_verified=True, world_index_policy='unrecognized')
-            self.assertIsNone(_verified_exact_payload(root, entry))
-
     def test_release_version(self):
-        self.assertEqual(tmrkr.VERSION, "1.0.4")
+        self.assertEqual(tmrkr.VERSION, "1.0.5")
 
     def test_removed_ptr_plugins_stay_excluded(self):
         self.assertIn("ptrfo4001_t60pistol.esl", EXCLUDED_PLUGINS)
