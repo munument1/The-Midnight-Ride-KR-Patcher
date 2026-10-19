@@ -1,8 +1,8 @@
 {
   "version": "1.0.5",
   "plugin_generation": "installed_source_only",
-  "zip_bytes": 74091621,
-  "zip_sha256": "88ce345bae8e029de1c44ff2ac42a7ec4c684279ce2d9f2f9ff3f3d03809d19c",
+  "zip_bytes": 74093046,
+  "zip_sha256": "315dee0f12284ca50fe7664ef0595a404404ef478ebd06665a82f9b5fd23ae52",
   "plugins_in_zip": [],
   "tests_passed": 42,
   "tests_skipped": 0,
@@ -492,5 +492,12 @@
       "nontext_preserved": true,
       "protected_zimonja_records": []
     }
-  ]
+  ],
+  "withdrawn_release_downloads": [
+    "v1.0.1",
+    "v1.0.2",
+    "v1.0.4"
+  ],
+  "git_history_plugins": [],
+  "documentation_only_repack": true
 }

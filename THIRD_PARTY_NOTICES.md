@@ -20,7 +20,7 @@ No xTranslator binary or source file is bundled in the release package.
 
 ## FO4_AE_1.11.191.Kor
 
-The release package includes the unofficial Korean resource package `FO4_AE_1.11.191.Kor`. It is included as a redistributable Korean patch resource so users do not need to obtain or select it separately.
+The release package includes the unofficial Korean resource package `FO4_AE_1.11.191.Kor`, including Fallout 4 Korean translation resources by **Team Waldo (팀 왈도)**. Credit and rights to those translations remain with their respective translators. This patcher is a separate project.
 
 ## Python / PyInstaller
 
@@ -29,3 +29,7 @@ The Windows GUI executable is packaged from Python source with PyInstaller. Pyth
 ## Bethesda / Fallout
 
 Fallout, Fallout 4, game files, names, and related trademarks are property of their respective rights holders. This project is an unofficial community localization tool.
+
+## Original mod plugins
+
+Original mod plugins and complete translated ESP/ESM/ESL files are not distributed in the source repository or release package. The patcher applies translation mappings to files from the user's existing installation and generates translated files locally. Users must obtain and install the original mods separately.

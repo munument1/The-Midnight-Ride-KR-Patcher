@@ -27,3 +27,13 @@ FO4_AE_1.11.191.Kor/
 ReleaseBase/
 .v101-*/
 PathLayoutTest*/
+
+# Original and generated game plugins are local build inputs/outputs only.
+*.esp
+*.esm
+*.esl
+*.ESP
+*.ESM
+*.ESL
+*.ba2
+*.bsa
