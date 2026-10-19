@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "package": "TMR-Korean-Patcher-v1.0.4.zip",
-  "package_sha256": "25e7d563f3dcfb23d575498050d7f5926c99b6857f507b35a963dedabb81f430",
+  "package_sha256": "348ec48f75e9f4ad2b6b828eb2bd30484b81d3e41c9f289de9f31fa87fea14ac",
   "status": "passed_file_audit",
-  "in_game_validation": "not_performed",
+  "in_game_validation": "User reports normal Korean and save-file Korean display, and no terrain issue in tested areas; not exhaustive stability or performance testing.",
   "plugins": [
     {
       "plugin": "unofficial fallout 4 patch.esp",
@@ -121,5 +121,6 @@
         }
       ]
     }
-  ]
+  ],
+  "package_repack": "Release documentation updated; executable/backend bytes and every plugin payload hash rechecked unchanged. Original source comparison retained."
 }
